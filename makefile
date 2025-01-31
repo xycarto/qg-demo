@@ -22,6 +22,10 @@ PHONY:
 clean: 
 	$(RUN) python3 -m src.clean.clean-names
 
+# make unzip zip=data/qld-government/point-clouds/ahd/Brisbane_2009_LGA_SW_499000_6960000_1K_Las.zip
+unzip:
+	$(RUN) python3 -m src.clean.unzip-las $(zip)
+
 ### PROCESS
 # bcm: 
 # 	$(RUN) python3  src/bcm-no-buff.py $(pc)

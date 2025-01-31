@@ -3,6 +3,7 @@ import os
 class contants(str):
     DATA_DIR = "data"
     QG_BUCKET = "qg-lidar"
+    QG_LAS = "las"
     QG_SURFACE_BUCKET = "qg-surfaces"
     QG_GRID_BUCKET = "qg-grids"
     QG_VIEWER_BUCKET = "qg-viewer"
