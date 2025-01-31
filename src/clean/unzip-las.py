@@ -6,10 +6,9 @@ import zipfile
 def main():
 
     zlist = zipfile.ZipFile(zfile)
-    zf = zlist.open(zlist.namelist()[0])
-    content = zf.read()
-    with open(os.path.join(laspath,zlist.namelist()[0]), 'wb') as f:
-        f.write(content)
+    with zlist.open(zlist.namelist()[0]) as zf:
+        with open(os.path.join(laspath,zlist.namelist()[0]), 'wb') as f:
+            f.write(zf.read())
 
 if __name__ == "__main__":
 
