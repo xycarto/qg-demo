@@ -1,14 +1,17 @@
 import os 
 
-class contants(str):
+class constants(str):
     DATA_DIR = "data"
+    WORKUNIT = "qld-government"
     QG_BUCKET = "qg-lidar"
     QG_LAS = "las"
+    QG_DEM = "dem"
+    QG_DSM = "dsm"
     QG_FILTERED = "filtered"
     QG_SURFACE_BUCKET = "qg-surfaces"
     QG_GRID_BUCKET = "qg-grids"
     QG_VIEWER_BUCKET = "qg-viewer"
-    CRS = "4269"
+    CRS = "28356"
     RESOLUTION = 1
 
 

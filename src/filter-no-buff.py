@@ -10,8 +10,9 @@ def filter_laz(in_file):
     print("Filtering...")   
     bcm_file =  f"{OUTPATH}/{os.path.basename(in_file)}"
     sub.call(
-        f"pdal -v 0 pipeline '{pipelines.FILTER}' \
-            --readers.las.filename='{in_file}' \
+        f"pdal -v 8 pipeline --nostream '{pipelines.FILTER}' \
+            --readers.las.filename='{in_file}' \ \
+            --readers.las.spatialreference='EPSG:{constants.CRS}' \
             --writers.las.filename='{bcm_file}'",
         shell=True,
     )
@@ -30,7 +31,7 @@ def main():
 if __name__ == "__main__":
 
     IN_FILE = sys.argv[1]
-    OUTPATH = os.path.join(contants.DATA_DIR, contants.QG_FILTERED, '/'.join(IN_FILE.split("/")[1:-1]))
+    OUTPATH = os.path.join(constants.DATA_DIR, constants.WORKUNIT, constants.QG_FILTERED)
 
     for d in [OUTPATH]:
         os.makedirs(d, exist_ok=True)

@@ -26,20 +26,25 @@ unzip:
 	$(RUN) python3 -m src.clean.unzip-las $(zip)
 
 ## INDEX
-# make index dir=data/las/qld-government/point-clouds/ahd
+# make index dir=data/qld-government/las
 index:
 	$(RUN) python3 -m src.index-las $(dir)
 
 ### PROCESS
-# make bcm pc=data/las/qld-government/point-clouds/ahd/Brisbane_2009_LGA_SW_499000_6960000_1K_Las.laz
-bcm: 
-	$(RUN) python3  src/bcm-no-buff.py $(pc)
+# make filter pc=data/qld-government/las/Brisbane_2009_LGA_SW_499000_6960000_1K_Las.laz
+filter: 
+	$(RUN) python3  src/filter-no-buff.py $(pc)
 
+# make surfaces pc=data/qld-government/las/Brisbane_2009_LGA_SW_499000_6960000_1K_Las.laz
+surfaces:
+	$(RUN) python3  src/surfaces.py $(pc)
 
 
 ### TEST
 pdalinfo:
-	$(RUN) pdal info $(pc)
+	$(RUN) pdal info --summary data/qld-government/las/Brisbane_2009_LGA_SW_499000_6960000_1K_Las.laz
+#	$(RUN) pdal --version
+#	$(RUN) pdal info $(pc)
 
 ### PROCESS
 # bcm: 

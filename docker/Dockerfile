@@ -1,4 +1,4 @@
-FROM  ubuntu:22.04
+FROM  ubuntu:24.04
 
 ENV TZ Pacific/Auckland
 
@@ -18,7 +18,9 @@ RUN apt-get update && \
 		apt-get install -y python3-pip cmake++ ninja-build && \
     apt upgrade --yes && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN pip3 install Ninja
+
+RUN pip3 install ninja --break-system-packages
+# python -m pip install ninja
 
 # Install GDAL
 RUN apt-get update && \
@@ -26,7 +28,7 @@ RUN apt-get update && \
     apt upgrade --yes && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN apt-get update && apt-get install -y pdal
+# RUN apt-get update && apt-get install -y pdal
 
 # # Compile LASzip
 # RUN cd / && git clone --depth 1 https://github.com/LASzip/LASzip.git
@@ -36,12 +38,15 @@ RUN apt-get update && apt-get install -y pdal
 # RUN cd / && git clone --depth 1 https://github.com/pdal/pdal.git
 # RUN cd /pdal && mkdir build && cd build && cmake -G Ninja .. && sed -i 's/CMAKE_BUILD_TYPE:STRING=/CMAKE_BUILD_TYPE:STRING=Release/' ./CMakeCache.txt && echo 'WITH_LASZIP:BOOL=ON' >> ./CMakeCache.txt && ninja && ninja install && cd /
 
+# Compile PDAL
+RUN cd / && git clone https://github.com/pdal/pdal.git
+RUN cd /pdal && mkdir build && cd build && cmake -G Ninja .. && sed -i 's/CMAKE_BUILD_TYPE:STRING=/CMAKE_BUILD_TYPE:STRING=Release/' ./CMakeCache.txt && echo 'WITH_LASZIP:BOOL=ON' >> ./CMakeCache.txt && ninja && ninja install && cd /
+
 # Install Python packages
 
-RUN apt-get update && apt-get -y install python3-pip
-RUN pip3 install boto3 geopandas rasterio pyproj
-RUN pip3 install awscli
-RUN pip3 install laspy
+RUN pip3 install boto3 geopandas rasterio pyproj --break-system-packages
+RUN pip3 install awscli --break-system-packages
+RUN pip3 install laspy --break-system-packages
 
 # Install GRASS
 RUN apt-get update && apt-get -y install grass-core grass-dev

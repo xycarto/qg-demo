@@ -5,6 +5,7 @@ import json
 from osgeo import gdal
 import geopandas as gp
 from globals import *
+from shapely.geometry import Polygon
 
 def get_creds():
     s3 = boto3.client(
@@ -38,28 +39,31 @@ class get_pc_metadata:
         
         pc_json = json.loads(pc_metadata)
         
+        self.header = pc_json
         self.minx = pc_json['summary']['bounds']['minx']
         self.miny = pc_json['summary']['bounds']['miny']
         self.maxx = pc_json['summary']['bounds']['maxx']
         self.maxy = pc_json['summary']['bounds']['maxy']
-        self.proj4 = pc_json['summary']['srs']['proj4']
-        self.wkt = pc_json['summary']['srs']['wkt']
+        # self.proj4 = pc_json['summary']['srs']['proj4']
+        # self.wkt = pc_json['summary']['srs']['wkt']
+        self.crs = constants.CRS
         self.bounds = f"'([{self.minx}, {self.maxx}],[{self.miny}, {self.maxy}])'"
 
-        self.width = int(abs(abs(self.maxx) - abs(self.minx)) / RESOLUTION)
-        self.height = int(abs(abs(self.maxy) - abs(self.miny)) / RESOLUTION)
+        self.width = int(abs(abs(self.maxx) - abs(self.minx)) / constants.RESOLUTION)
+        self.height = int(abs(abs(self.maxy) - abs(self.miny)) / constants.RESOLUTION)
 
-def filter_laz(in_file, index_row):
-    print("Filtering...")   
-    bcm_file =  f"{BCM_DIR}/{os.path.basename(in_file)}"
-    crs = f"EPSG:{index_row.native_horiz_crs.values[0]}"
-    sub.call(
-        f"pdal -v 0 --nostream pipeline '{PIPELINE_FILTER}' \
-            --readers.las.filename='{in_file}' \
-            --writers.las.filename='{bcm_file}' \
-            --writers.las.a_srs='{crs}'",
-        shell=True,
-    )
+# def filter_laz(in_file, index_row):
+#     print("Filtering...")   
+#     bcm_file =  f"{BCM_DIR}/{os.path.basename(in_file)}"
+#     crs = f"EPSG:{index_row.native_horiz_crs.values[0]}"
+#     sub.call(
+#         f"pdal -v 0 --nostream pipeline '{pipelines.FILTER}' \
+#             --readers.las.filename='{in_file}' \ \
+#             --readers.las.spatialreference='{constants.CRS}' \
+#             --writers.las.filename='{bcm_file}' \
+#             --writers.las.a_srs='{constants.CRS}'",
+#         shell=True,
+#     )
 
 def get_bound_info(pc):
     pc_metadata = sub.check_output(
@@ -81,7 +85,7 @@ def make_dsm_tin(pipeline, in_pc, out_tif, metadata):
         f"pdal pipeline '{pipeline}' \
             --readers.las.filename='{in_pc}' \
             --readers.las.spatialreference='{metadata.wkt}'  \
-            --filters.faceraster.resolution='{RESOLUTION}' \
+            --filters.faceraster.resolution='{constants.RESOLUTION}' \
             --filters.faceraster.origin_x='{metadata.minx}' \
             --filters.faceraster.origin_y='{metadata.miny}' \
             --filters.faceraster.width='{metadata.width}' \
@@ -94,9 +98,8 @@ def make_dem_tin(pipeline, in_pc, out_tif, metadata):
     sub.call(
         f"pdal pipeline '{pipeline}' \
             --readers.las.filename='{in_pc}' \
-            --readers.las.spatialreference='{metadata.wkt}' \
-            --filters.faceraster.resolution='{RESOLUTION}' \
-            --filters.faceraster.bounds={metadata.bounds} \
+            --readers.las.spatialreference='EPSG:{constants.CRS}' \
+            --filters.faceraster.resolution='{constants.RESOLUTION}' \
             --writers.raster.filename='{out_tif}'",
         shell=True,
     )
@@ -128,3 +131,30 @@ def gdal_clip(data_dir, basename, in_file, index, in_tif, out_tif):
     )
 
     return tmp_gpkg, out_tif
+
+def write_df(df, horiz_crs, laz_name, workunit, usgs_loc, vert_crs, header, poly):
+    df.append(
+        {
+            'file_name':laz_name,
+            'workunit': workunit,
+            'location': usgs_loc,
+            'native_horiz_crs':horiz_crs,
+            'native_vert_crs':vert_crs,
+            'point_count': header['summary']['metadata']['count'],
+            'geometry': poly
+        }
+    )
+
+def bbox(header):    
+    minx = header['summary']['bounds']['minx']
+    miny = header['summary']['bounds']['miny']
+    maxx = header['summary']['bounds']['maxx']
+    maxy = header['summary']['bounds']['maxy']
+    
+    poly = Polygon([[minx, miny],
+                    [maxx, miny],
+                    [maxx, maxy],
+                    [minx, maxy],
+                    [minx, miny]])
+    
+    return poly
