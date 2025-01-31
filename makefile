@@ -25,6 +25,11 @@ clean:
 unzip:
 	$(RUN) python3 -m src.clean.unzip-las $(zip)
 
+## INDEX
+# make index dir=data/las/qld-government/point-clouds/ahd
+index:
+	$(RUN) python3 -m src.index-las $(dir)
+
 ### PROCESS
 # make bcm pc=data/las/qld-government/point-clouds/ahd/Brisbane_2009_LGA_SW_499000_6960000_1K_Las.laz
 bcm: 
