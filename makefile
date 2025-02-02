@@ -39,6 +39,26 @@ filter:
 surfaces:
 	$(RUN) python3  src/surfaces.py $(pc)
 
+### COGS
+# make cog dir=data/qld-government/dem
+cog: 
+	$(RUN) python3 src/cog.py $(dir)
+
+### Vector Tiles
+
+
+### BUILDS
+# make process-zips dir=data/qld-government/point-clouds/ahd
+process-zips:
+	$(RUN) bash src/builds/process-zips.sh $(dir)
+
+# make filter-las dir=data/qld-government/las
+filter-las:
+	$(RUN) bash src/builds/filter-las.sh $(dir)
+
+# make process-surfaces dir=data/qld-government/filtered
+process-surfaces:
+	$(RUN) bash src/builds/process-surfaces.sh $(dir)
 
 ### TEST
 pdalinfo:
@@ -46,52 +66,6 @@ pdalinfo:
 #	$(RUN) pdal --version
 #	$(RUN) pdal info $(pc)
 
-### PROCESS
-# bcm: 
-# 	$(RUN) python3  src/bcm-no-buff.py $(pc)
-
-# dsm: 
-# 	$(RUN) python3 src/dsm-tin.py $(pc)
-
-# dem: 
-# 	$(RUN) python3 src/dem-tin.py $(pc)
-
-# chm: 
-# 	$(RUN) python3 src/chm.py $(pc)
-
-
-# ## DERIVED PRODUCTS
-# slope:
-# 	$(RUN) python3 src/slope.py $(tif)
-
-# solar-average:
-# 	$(RUN) python3 src/solar/solar-calc.py $(tif)
-
-# hillshade:
-# 	$(RUN) python3 src/hillshade.py $(tif) 
-
-# reproject:
-# 	$(RUN) python3 src/reproject.py $(tif) 
-
-# cog:
-# 	$(RUN) python3 src/cog.py $(in_dir)
-
-# ## HELPERS
-# download-files:
-# 	$(RUN) python3 src/download-files.py
-
-# vrt:
-# 	$(RUN) python3 src/vrt.py 
-
-# list-files:
-# 	$(RUN) python3 src/list-index.py $(testnum)
-
-# ## TEST EXTENTS
-# test-extent:
-# 	$(RUN) python3 src/test/test-extents.py $(pc)
-
-# test-dirs:
-# 	$(RUN) python3 src/test-dirs.py
 
 ##### DOCKER MAIN
 local-test: docker/Dockerfile

@@ -7,6 +7,7 @@ class constants(str):
     QG_LAS = "las"
     QG_DEM = "dem"
     QG_DSM = "dsm"
+    QG_COG = "cog"
     QG_FILTERED = "filtered"
     QG_SURFACE_BUCKET = "qg-surfaces"
     QG_GRID_BUCKET = "qg-grids"
